@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".AnswerSendActivity">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/answer_text_label" />
+
+    <EditText
+        android:id="@+id/answerEditText"
+        android:layout_width="match_parent"
+        android:layout_height="192dp"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentStart="true"
+        android:autofillHints=""
+        android:gravity="top"
+        android:hint="@string/answer_error_message"
+        android:inputType="textMultiLine"
+        android:maxLines="10"
+        tools:ignore="VisualLintTextFieldSize" />
+
+    <Button
+        android:id="@+id/sendButton"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@+id/answerEditText"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/custom_button"
+        android:text="@string/send_button_label"
+        android:textColor="@color/white"
+        tools:ignore="TextContrastCheck,VisualLintButtonSize" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/sendButton"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+</RelativeLayout>
