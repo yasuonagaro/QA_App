@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import jp.techacademy.yasuo.nagaro.qa_app.databinding.ActivityQuestionDetailBinding
@@ -15,6 +16,7 @@ class QuestionDetailActivity : AppCompatActivity() {
     private lateinit var question: Question
     private lateinit var adapter: QuestionDetailListAdapter
     private lateinit var answerRef: DatabaseReference
+    private var favoriteRef: DatabaseReference? = null
 
     private val eventListener = object : ChildEventListener {
         override fun onChildAdded(dataSnapshot: DataSnapshot, s: String?) {
@@ -44,13 +46,14 @@ class QuestionDetailActivity : AppCompatActivity() {
         override fun onCancelled(databaseError: DatabaseError) {}
     }
 
+    private var favoriteListener: ValueEventListener? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityQuestionDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // 渡ってきたQuestionのオブジェクトを保持する
-        // API33以上でgetSerializableExtra(key)が非推奨となったため処理を分岐
         @Suppress("UNCHECKED_CAST", "DEPRECATION", "DEPRECATED_SYNTAX_WITH_DEFINITELY_NOT_NULL")
         question = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
             intent.getSerializableExtra("question", Question::class.java)!!
@@ -74,11 +77,9 @@ class QuestionDetailActivity : AppCompatActivity() {
                 startActivity(intent)
             } else {
                 // Questionを渡して回答作成画面を起動する
-                // --- ここから ---
                 val intent = Intent(applicationContext, AnswerSendActivity::class.java)
                 intent.putExtra("question", question)
                 startActivity(intent)
-                // --- ここまで ---
             }
         }
 
@@ -86,5 +87,47 @@ class QuestionDetailActivity : AppCompatActivity() {
         answerRef = dataBaseReference.child(ContentsPATH).child(question.genre.toString())
             .child(question.questionUid).child(AnswersPATH)
         answerRef.addChildEventListener(eventListener)
+
+        // お気に入り登録処理
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            binding.favoriteButton.visibility = View.VISIBLE
+
+            favoriteRef = dataBaseReference.child(FavoritesPATH).child(user.uid).child(question.questionUid)
+            favoriteListener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    question.isFavorite = snapshot.exists()
+                    updateFavoriteButton()
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // N/A
+                }
+            }
+            favoriteRef!!.addValueEventListener(favoriteListener!!)
+
+            binding.favoriteButton.setOnClickListener {
+                if (question.isFavorite) {
+                    favoriteRef!!.removeValue()
+                } else {
+                    favoriteRef!!.setValue(true)
+                }
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (favoriteListener != null) {
+            favoriteRef?.removeEventListener(favoriteListener!!)
+        }
+    }
+
+    private fun updateFavoriteButton() {
+        if (question.isFavorite) {
+            binding.favoriteButton.setImageResource(R.drawable.ic_star)
+        } else {
+            binding.favoriteButton.setImageResource(R.drawable.ic_star_border)
+        }
     }
 }

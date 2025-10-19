@@ -14,6 +14,7 @@ class Question(
     val answers: ArrayList<Answer>
 ) : Serializable {
     val imageBytes: ByteArray
+    var isFavorite: Boolean = false // お気に入り状態
 
     init {
         imageBytes = bytes.clone()

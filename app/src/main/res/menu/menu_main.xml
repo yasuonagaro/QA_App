@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="jp.techacademy.taro.kirameki.qa_app.MainActivity">
+    tools:context="jp.techacademy.yasuo.nagaro.qa_app.MainActivity">
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
