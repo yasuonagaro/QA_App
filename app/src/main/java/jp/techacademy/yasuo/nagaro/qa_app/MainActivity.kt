@@ -206,23 +206,33 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 binding.content.toolbar.title = getString(R.string.menu_computer_label)
                 genre = 4
             }
+            R.id.nav_favorite -> {
+                val user = FirebaseAuth.getInstance().currentUser
+                if (user == null) {
+                    val intent = Intent(applicationContext, LoginActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    val intent = Intent(applicationContext, FavoriteActivity::class.java)
+                    startActivity(intent)
+                }
+            }
         }
 
         binding.drawerLayout.closeDrawer(GravityCompat.START)
 
-        // ----- 追加:ここから -----
-        // 質問のリストをクリアしてから再度Adapterにセットし、AdapterをListViewにセットし直す
-        questionArrayList.clear()
-        adapter.setQuestionArrayList(questionArrayList)
-        binding.content.inner.listView.adapter = adapter
+        if (item.itemId != R.id.nav_favorite) {
+            // 質問のリストをクリアしてから再度Adapterにセットし、AdapterをListViewにセットし直す
+            questionArrayList.clear()
+            adapter.setQuestionArrayList(questionArrayList)
+            binding.content.inner.listView.adapter = adapter
 
-        // 選択したジャンルにリスナーを登録する
-        if (genreRef != null) {
-            genreRef!!.removeEventListener(eventListener)
+            // 選択したジャンルにリスナーを登録する
+            if (genreRef != null) {
+                genreRef!!.removeEventListener(eventListener)
+            }
+            genreRef = databaseReference.child(ContentsPATH).child(genre.toString())
+            genreRef!!.addChildEventListener(eventListener)
         }
-        genreRef = databaseReference.child(ContentsPATH).child(genre.toString())
-        genreRef!!.addChildEventListener(eventListener)
-        // ----- 追加:ここまで -----
 
         return true
     }

@@ -110,7 +110,9 @@ class QuestionDetailActivity : AppCompatActivity() {
                 if (question.isFavorite) {
                     favoriteRef!!.removeValue()
                 } else {
-                    favoriteRef!!.setValue(true)
+                    val data = HashMap<String, String>()
+                    data["genre"] = question.genre.toString()
+                    favoriteRef!!.setValue(data)
                 }
             }
         }
